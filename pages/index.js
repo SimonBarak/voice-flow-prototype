@@ -1,27 +1,29 @@
 import PlayIco from "../assets/icons/play.svg";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-const PhraseBox = ({ dataObj, index, setActiveSlide }) => {
-  const [textarea, setTextarea] = useState(dataObj.text);
-
-  const [imgData, setImgData] = useState(null);
+const PhraseBox = ({ dataObj, index, saveData }) => {
+  const [text, setText] = useState(dataObj.text);
+  const [imgSrc, setImgSrc] = useState(dataObj.imgSrc);
 
   const playAudio = () => {
-    console.log(textarea);
-    let utterance = new SpeechSynthesisUtterance(textarea);
+    let utterance = new SpeechSynthesisUtterance(text);
     speechSynthesis.speak(utterance);
-    setActiveSlide(imgData);
+    localStorage.setItem("voice-flow-slide", JSON.stringify({ data: imgSrc }));
   };
 
   const handleChange = (event) => {
-    setTextarea(event.target.value);
+    dataObj.text = event.target.value;
+    setText(event.target.value);
+    saveData();
   };
 
   const onChangePicture = (e) => {
     if (e.target.files[0]) {
       const reader = new FileReader();
       reader.addEventListener("load", () => {
-        setImgData(reader.result);
+        dataObj.imgSrc = reader.result;
+        setImgSrc(reader.result);
+        //saveData();
       });
       reader.readAsDataURL(e.target.files[0]);
     }
@@ -38,20 +40,33 @@ const PhraseBox = ({ dataObj, index, setActiveSlide }) => {
               onClick={playAudio}
             >
               {/* <PlayIco className="fill-current w-4 h-4 lg:w-8 mt-6 " /> */}
-              Play
+
+              <div className="w-4 h-4 lg:w-8 mt-6">
+                <svg
+                  width="100%"
+                  height="100%"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M16.3546 9.61852C17.0583 9.99551 17.0583 11.0045 16.3546 11.3815L5.47222 17.2113C4.80605 17.5682 4 17.0856 4 16.3298L4 4.67017C4 3.91443 4.80606 3.43181 5.47222 3.78869L16.3546 9.61852Z"
+                    fill="current"
+                  />
+                </svg>
+              </div>
             </button>
           </div>
           <div className="w-full">
             <textarea
               className="w-full p-4"
-              value={textarea}
+              value={dataObj.text}
               onChange={handleChange}
               placeholder="Add text"
             />
           </div>
 
           <div className="w-48">
-            <img className="h-16 bg-gray-500" src={imgData} />
+            <img className="h-16" src={imgSrc} />
 
             <div className="text-sm">
               <input id="profilePic" type="file" onChange={onChangePicture} />
@@ -69,26 +84,84 @@ const defaultPrompts = [
 ];
 
 export default function Home() {
+  const [isPresenationView, setIsPresenationView] = useState(false);
   const [activeSlide, setActiveSlide] = useState("");
-  const [list, setList] = useState(defaultPrompts);
+  const [prompBoxs, setPrompBoxs] = useState(defaultPrompts);
 
-  const PhrasesList = list.map((dataObj, index) => (
+  useEffect(() => {
+    // Update the document title using the browser API
+    const savedString = localStorage.getItem("voice-flow-data");
+    if (savedString) {
+      const { prompBoxs } = JSON.parse(localStorage.getItem("voice-flow-data"));
+      if (prompBoxs) setPrompBoxs(prompBoxs);
+    }
+
+    setInterval(() => {
+      const slideDataString = localStorage.getItem("voice-flow-slide");
+      if (slideDataString) {
+        const { data } = JSON.parse(slideDataString);
+        if (data !== activeSlide) setActiveSlide(data);
+      }
+    }, 1000);
+  }, []);
+
+  const addPrompBox = (prompObj) => {
+    setPrompBoxs([...prompBoxs, { text: "", imgSrc: "" }]);
+  };
+
+  const saveData = (second) => {
+    localStorage.setItem("voice-flow-data", JSON.stringify({ prompBoxs }));
+  };
+
+  const toggleView = (params) => {
+    setIsPresenationView(!isPresenationView);
+  };
+
+  const PhrasesList = prompBoxs.map((dataObj, index) => (
     <PhraseBox
       dataObj={dataObj}
-      setActiveSlide={setActiveSlide}
+      saveData={saveData}
       index={index}
       key={index + dataObj.text}
     />
   ));
 
   return (
-    <div className="flex py-20 ">
-      <div className="w-1/2">{PhrasesList}</div>
-      <div className="w-1/2">
-        <div className="p-2 text-center text-sm">Shared screen</div>
-        <div className="p-2 px-8">
-          <img src={activeSlide} alt="" />
+    <div className="flex py-20">
+      {isPresenationView ? (
+        <div className="-">
+          <div className="-">
+            <img src={activeSlide} alt="" />
+          </div>
         </div>
+      ) : (
+        <div className="w-full">
+          <div>{PhrasesList}</div>
+          <div>
+            <button
+              onClick={addPrompBox}
+              className="p-2 ml-10 rounded bg-gray-100"
+            >
+              Add
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="fixed bottom-0  p-2">
+        <label
+          htmlFor="toggle-example"
+          className="flex items-center cursor-pointer relative mb-4"
+        >
+          <input
+            type="checkbox"
+            id="toggle-example"
+            className="sr-only"
+            onChange={toggleView}
+          />
+          <div className="toggle-bg bg-gray-200 border-2 border-gray-200 h-6 w-11 rounded-full"></div>
+          <span className="ml-3 text-gray-900 text-sm font-medium">P</span>
+        </label>
       </div>
     </div>
   );
