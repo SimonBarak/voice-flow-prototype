@@ -5,10 +5,23 @@ const PhraseBox = ({ dataObj, index, saveData }) => {
   const [text, setText] = useState(dataObj.text);
   const [imgSrc, setImgSrc] = useState(dataObj.imgSrc);
 
+  // const playAudio = () => {
+  //   let utterance = new SpeechSynthesisUtterance(text);
+  //   speechSynthesis.speak(utterance);
+  //   localStorage.setItem("voice-flow-slide", JSON.stringify({ data: imgSrc }));
+  // };
+
   const playAudio = () => {
-    let utterance = new SpeechSynthesisUtterance(text);
-    speechSynthesis.speak(utterance);
-    localStorage.setItem("voice-flow-slide", JSON.stringify({ data: imgSrc }));
+    console.log(dataObj.audioUrl);
+    let utterance = new Audio(dataObj.audioUrl);
+    console.log(utterance);
+    utterance.play();
+
+    if (imgSrc)
+      localStorage.setItem(
+        "voice-flow-slide",
+        JSON.stringify({ data: imgSrc })
+      );
   };
 
   const handleChange = (event) => {
@@ -32,7 +45,7 @@ const PhraseBox = ({ dataObj, index, saveData }) => {
   return (
     <div className="flex w-full">
       <div className="m-4 text-gray-500">{index}</div>
-      <div className="w-full bg-white mb-2">
+      <div className="bg-white mb-2">
         <div className="flex">
           <div>
             <button
@@ -58,7 +71,7 @@ const PhraseBox = ({ dataObj, index, saveData }) => {
           </div>
           <div className="w-full">
             <textarea
-              className="w-full p-4"
+              className="w-60 p-4"
               value={dataObj.text}
               onChange={handleChange}
               placeholder="Add text"
@@ -78,9 +91,34 @@ const PhraseBox = ({ dataObj, index, saveData }) => {
   );
 };
 
+const audioUrl = "https://wavepagestorage.blob.core.windows.net/audiofiles/";
+
 const defaultPrompts = [
-  { text: "", imgSrc: "" },
-  { text: "", imgSrc: "" },
+  {
+    text: "Which album should I choose?",
+    imgSrc: "/a-1.jpg",
+    audioUrl: `${audioUrl}d-56355.mp3`,
+  },
+  {
+    text: "Here we go, we will be there in 10mins",
+    imgSrc: "/a-2.jpg",
+    audioUrl: `${audioUrl}d-98025.mp3`,
+  },
+  {
+    text: "I don't understand",
+    imgSrc: "",
+    audioUrl: `${audioUrl}d-84718.mp3`,
+  },
+  {
+    text: "What is the address?",
+    imgSrc: "",
+    audioUrl: `${audioUrl}d-34242.mp3`,
+  },
+  {
+    text: "Do you want to open the calendar?",
+    imgSrc: "/a-2.jpg",
+    audioUrl: `${audioUrl}d-52333.mp3`,
+  },
 ];
 
 export default function Home() {
@@ -127,23 +165,25 @@ export default function Home() {
   ));
 
   return (
-    <div className="flex py-20">
+    <div className="">
       {isPresenationView ? (
-        <div className="-">
-          <div className="-">
-            <img src={activeSlide} alt="" />
+        <div className="flex py-20">
+          <div>
+            <img src={activeSlide} alt="" className="bg-contain bg-center" />
           </div>
         </div>
       ) : (
-        <div className="w-full">
-          <div>{PhrasesList}</div>
-          <div>
-            <button
-              onClick={addPrompBox}
-              className="p-2 ml-10 rounded bg-gray-100"
-            >
-              Add
-            </button>
+        <div className="flex py-20 bg-gray-200">
+          <div className="w-full ">
+            <div>{PhrasesList}</div>
+            <div>
+              <button
+                onClick={addPrompBox}
+                className="p-2 ml-10 rounded bg-gray-100"
+              >
+                Add
+              </button>
+            </div>
           </div>
         </div>
       )}
