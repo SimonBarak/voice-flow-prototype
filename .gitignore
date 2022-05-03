@@ -32,3 +32,26 @@ yarn-error.log*
 
 # vercel
 .vercel
+.next/trace
+.next/build-manifest.json
+.next/cache/webpack/client-development/0.pack
+.next/cache/webpack/client-development/index.pack
+.next/cache/webpack/client-development/index.pack.old
+.next/cache/webpack/server-development/0.pack
+.next/cache/webpack/server-development/index.pack
+.next/cache/webpack/server-development/index.pack.old
+.next/server/middleware-build-manifest.js
+.next/server/pages-manifest.json
+.next/server/pages/_app.js
+.next/trace
+.next/build-manifest.json
+.next/cache/webpack/client-development/0.pack
+.next/cache/webpack/client-development/index.pack
+.next/cache/webpack/client-development/index.pack.old
+.next/cache/webpack/server-development/0.pack
+.next/cache/webpack/server-development/index.pack
+.next/cache/webpack/server-development/index.pack.old
+.next/server/middleware-build-manifest.js
+.next/server/pages-manifest.json
+.next/server/pages/_app.js
+.next/trace
