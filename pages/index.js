@@ -116,7 +116,7 @@ const defaultPrompts = [
   },
   {
     text: "Do you want to open the calendar?",
-    imgSrc: "/a-2.jpg",
+    imgSrc: "/a-3.jpg",
     audioUrl: `${audioUrl}d-52333.mp3`,
   },
 ];
